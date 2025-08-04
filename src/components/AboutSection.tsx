@@ -1,11 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Code, Coffee, BookOpen, Camera } from "lucide-react";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const AboutSection = () => {
-  const { ref: sectionRef, isVisible: sectionVisible } = useScrollAnimation(0.1);
-  const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation(0.2);
-  const { ref: journeyRef, isVisible: journeyVisible } = useScrollAnimation(0.3);
   const interests = [
     {
       icon: Code,
@@ -30,13 +26,9 @@ const AboutSection = () => {
   ];
 
   return (
-    <section 
-      id="about" 
-      ref={sectionRef}
-      className="py-20 bg-gradient-to-b from-transparent to-accent/30 overflow-hidden"
-    >
+    <section id="about" className="py-20 bg-gradient-to-b from-transparent to-accent/30">
       <div className="max-w-6xl mx-auto px-6">
-        <div className={`text-center mb-16 slide-left ${sectionVisible ? 'animate-in' : ''}`}>
+        <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             About{" "}
             <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
@@ -50,36 +42,28 @@ const AboutSection = () => {
           </p>
         </div>
 
-        <div 
-          ref={cardsRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {interests.map((interest, index) => (
-            <div
-              key={index}
-              className={`fade-up stagger-${index + 1} ${cardsVisible ? 'animate-in' : ''}`}
+            <Card 
+              key={index} 
+              className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm"
             >
-              <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm hover:scale-105">
-                <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-primary to-primary-glow flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <interest.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {interest.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {interest.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-primary to-primary-glow flex items-center justify-center">
+                  <interest.icon className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+                  {interest.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {interest.description}
+                </p>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
-        <div 
-          ref={journeyRef}
-          className={`mt-16 bg-card rounded-2xl p-8 shadow-sm border scale-in ${journeyVisible ? 'animate-in' : ''}`}
-        >
+        <div className="mt-16 bg-card rounded-2xl p-8 shadow-sm border">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-2xl font-bold mb-4">My Journey</h3>
