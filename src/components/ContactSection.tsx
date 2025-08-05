@@ -3,35 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, Github, Linkedin, Twitter, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getPersonalInfo } from "@/services/content";
+import { PersonalInfo } from "@/types/content";
+import { contactMethods, iconMap } from "@/data/static";
 
 const ContactSection = () => {
-  const contactMethods = [
-    {
-      icon: Mail,
-      title: "Email",
-      value: "alex.johnson@example.com",
-      href: "mailto:alex.johnson@example.com"
-    },
-    {
-      icon: Github,
-      title: "GitHub",
-      value: "@alexjohnson",
-      href: "https://github.com/alexjohnson"
-    },
-    {
-      icon: Linkedin,
-      title: "LinkedIn",
-      value: "Alex Johnson",
-      href: "https://linkedin.com/in/alexjohnson"
-    },
-    {
-      icon: Twitter,
-      title: "Twitter",
-      value: "@alexjdev",
-      href: "https://twitter.com/alexjdev"
-    }
-  ];
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null);
+
+  useEffect(() => {
+    const loadPersonalInfo = async () => {
+      const info = await getPersonalInfo();
+      setPersonalInfo(info);
+    };
+    loadPersonalInfo();
+  }, []);
 
   return (
     <section id="contact" className="py-20 bg-gradient-to-b from-transparent to-accent/30">
@@ -107,34 +94,62 @@ const ContactSection = () => {
               
               <div className="flex items-center gap-2 text-muted-foreground mb-8">
                 <MapPin className="h-5 w-5" />
-                <span>San Francisco, CA</span>
+                <span>{personalInfo?.location || "Loading..."}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {contactMethods.map((method, index) => (
-                <a 
-                  key={index}
-                  href={method.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group"
-                >
-                  <Card className="hover:shadow-md transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm">
-                    <CardContent className="p-6 text-center">
-                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-primary to-primary-glow flex items-center justify-center">
-                        <method.icon className="h-6 w-6 text-white" />
-                      </div>
-                      <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors">
-                        {method.title}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {method.value}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </a>
-              ))}
+              {contactMethods.map((method, index) => {
+                const IconComponent = iconMap[method.icon as keyof typeof iconMap];
+                // 根据个人信息动态生成链接
+                let href = method.href;
+                let value = method.value;
+                
+                if (personalInfo) {
+                  switch (method.title) {
+                    case "Email":
+                      href = `mailto:${personalInfo.email}`;
+                      value = personalInfo.email;
+                      break;
+                    case "GitHub":
+                      href = personalInfo.github;
+                      value = `@${personalInfo.github.split('/').pop()}`;
+                      break;
+                    case "LinkedIn":
+                      href = personalInfo.linkedin;
+                      value = personalInfo.name;
+                      break;
+                    case "Twitter":
+                      href = personalInfo.twitter;
+                      value = `@${personalInfo.twitter.split('/').pop()}`;
+                      break;
+                  }
+                }
+                
+                return (
+                  <a 
+                    key={index}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group"
+                  >
+                    <Card className="hover:shadow-md transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm">
+                      <CardContent className="p-6 text-center">
+                        <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-primary to-primary-glow flex items-center justify-center">
+                          <IconComponent className="h-6 w-6 text-white" />
+                        </div>
+                        <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors">
+                          {method.title}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          {value}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
