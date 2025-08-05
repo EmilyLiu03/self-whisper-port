@@ -1,29 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Code, Coffee, BookOpen, Camera } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getPersonalInfo } from "@/services/content";
+import { PersonalInfo } from "@/types/content";
+import { interests, skills, iconMap } from "@/data/static";
 
 const AboutSection = () => {
-  const interests = [
-    {
-      icon: Code,
-      title: "Web Development",
-      description: "Passionate about creating beautiful and functional web applications using modern technologies."
-    },
-    {
-      icon: Coffee,
-      title: "Coffee Enthusiast",
-      description: "I believe the best code is written with the perfect cup of coffee by your side."
-    },
-    {
-      icon: BookOpen,
-      title: "Continuous Learning",
-      description: "Always exploring new technologies, frameworks, and methodologies to improve my craft."
-    },
-    {
-      icon: Camera,
-      title: "Photography",
-      description: "Capturing moments and finding beauty in the everyday through the lens of my camera."
-    }
-  ];
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null);
+
+  useEffect(() => {
+    const loadPersonalInfo = async () => {
+      const info = await getPersonalInfo();
+      setPersonalInfo(info);
+    };
+    loadPersonalInfo();
+  }, []);
 
   return (
     <section id="about" className="py-20 bg-gradient-to-b from-transparent to-accent/30">
@@ -36,31 +26,39 @@ const AboutSection = () => {
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            I'm a full-stack developer with 5+ years of experience building scalable web applications. 
-            When I'm not coding, you can find me writing about tech, exploring new coffee shops, 
-            or capturing the world through photography.
+            {personalInfo ? (
+              <>
+                我是一名拥有 {personalInfo.experience} 经验的{personalInfo.title}。
+                当我不在编程时，你可以发现我在写技术文章、探索新的咖啡店，或者通过摄影捕捉世界的美好。
+              </>
+            ) : (
+              "Loading..."
+            )}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {interests.map((interest, index) => (
-            <Card 
-              key={index} 
-              className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm"
-            >
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-primary to-primary-glow flex items-center justify-center">
-                  <interest.icon className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
-                  {interest.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {interest.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          {interests.map((interest, index) => {
+            const IconComponent = iconMap[interest.icon as keyof typeof iconMap];
+            return (
+              <Card 
+                key={index} 
+                className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm"
+              >
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-primary to-primary-glow flex items-center justify-center">
+                    <IconComponent className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+                    {interest.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {interest.description}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         <div className="mt-16 bg-card rounded-2xl p-8 shadow-sm border">
@@ -78,14 +76,23 @@ const AboutSection = () => {
                 and thoughts on the ever-evolving world of technology.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              {['React', 'TypeScript', 'Node.js', 'Python', 'PostgreSQL', 'AWS', 'Docker', 'GraphQL'].map((tech, index) => (
-                <span 
-                  key={index}
-                  className="px-3 py-1 text-sm bg-accent rounded-full text-accent-foreground"
-                >
-                  {tech}
-                </span>
+            <div className="space-y-4">
+              {skills.map((skillCategory, categoryIndex) => (
+                <div key={categoryIndex}>
+                  <h4 className="font-semibold text-sm text-muted-foreground mb-2">
+                    {skillCategory.category}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {skillCategory.items.map((skill, skillIndex) => (
+                      <span 
+                        key={skillIndex}
+                        className="px-3 py-1 text-sm bg-accent rounded-full text-accent-foreground"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

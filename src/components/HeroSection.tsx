@@ -1,11 +1,32 @@
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getPersonalInfo } from "@/services/content";
+import { PersonalInfo } from "@/types/content";
 
 const HeroSection = () => {
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null);
+
+  useEffect(() => {
+    const loadPersonalInfo = async () => {
+      const info = await getPersonalInfo();
+      setPersonalInfo(info);
+    };
+    loadPersonalInfo();
+  }, []);
+
   const scrollToAbout = () => {
     const element = document.getElementById('about');
     element?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  if (!personalInfo) {
+    return (
+      <section id="home" className="min-h-screen flex items-center justify-center">
+        <div className="text-center">Loading...</div>
+      </section>
+    );
+  }
 
   return (
     <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -17,13 +38,12 @@ const HeroSection = () => {
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
             Hi, I'm{" "}
             <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-              Alex Johnson
+              {personalInfo.name}
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            A passionate full-stack developer and writer sharing insights about technology, 
-            life, and the journey of continuous learning.
+            {personalInfo.description}
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
@@ -36,14 +56,20 @@ const HeroSection = () => {
             </Button>
             
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="icon">
-                <Github className="h-5 w-5" />
+              <Button variant="outline" size="icon" asChild>
+                <a href={personalInfo.github} target="_blank" rel="noopener noreferrer">
+                  <Github className="h-5 w-5" />
+                </a>
               </Button>
-              <Button variant="outline" size="icon">
-                <Linkedin className="h-5 w-5" />
+              <Button variant="outline" size="icon" asChild>
+                <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer">
+                  <Linkedin className="h-5 w-5" />
+                </a>
               </Button>
-              <Button variant="outline" size="icon">
-                <Mail className="h-5 w-5" />
+              <Button variant="outline" size="icon" asChild>
+                <a href={`mailto:${personalInfo.email}`}>
+                  <Mail className="h-5 w-5" />
+                </a>
               </Button>
             </div>
           </div>
